@@ -1,0 +1,23 @@
+{
+  "name": "online-learning-downloader-cli",
+  "version": "1.1.40.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/cli/main.ts",
+    "start": "tsx src/cli/main.ts",
+    "build": "tsup src/cli/main.ts --format esm --clean --out-dir dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fflate": "0.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.0.0",
+    "tsup": "8.5.1",
+    "tsx": "4.19.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
