@@ -1,6 +1,6 @@
 export interface CliOptions
 {
-  url             : string;
+  urls            : string[];
   type            : "course" | "ebook" | "auto";
   cookie         ?: string;
   cookieFile     ?: string;
@@ -10,18 +10,20 @@ export interface CliOptions
   maxRetries      : number;
   baseDelay       : number;
   proxy          ?: string;
+  parallel        : boolean;
 }
 
 export function parseArgs(): CliOptions
 {
   const args = process.argv.slice(2);
   const options: CliOptions = {
-    url            : "",
+    urls           : [],
     type           : "auto",
     output         : "downloads",
     byPassWatermark: false,
     maxRetries     : 3,
     baseDelay      : 1000,
+    parallel       : false,
   };
 
   for ( let i = 0; i < args.length; i++ ) {
@@ -31,7 +33,7 @@ export function parseArgs(): CliOptions
     switch ( arg ) {
       case "--url":
       case "-u":
-        if (next) { options.url = next; i++; }
+        if (next) { options.urls.push(next); i++; }
         break;
       case "--type":
       case "-t":
@@ -67,6 +69,10 @@ export function parseArgs(): CliOptions
       case "--proxy":
         if (next) { options.proxy = next; i++; }
         break;
+      case "--parallel":
+      case "-p":
+        options.parallel = true;
+        break;
       case "--help":
       case "-h":
         printHelp();
@@ -74,7 +80,7 @@ export function parseArgs(): CliOptions
     }
   }
 
-  if (!options.url) {
+  if (options.urls.length === 0) {
     console.error("  Error: --url is required");
     printHelp();
     process.exit(1);
@@ -94,7 +100,7 @@ function printHelp(): void {
   Usage: npx tsx src/cli/main.ts [options]
 
   Required:
-    --url, -u       <url>           URL of the content to download
+    --url, -u       <url>           URL of the content to download (can be repeated)
     --cookie, -c    <string>        Cookie string (e.g., "orm-jwt=...; orm-rt=...")
     --cookie-file   <path>          Netscape cookies.txt file
     --cookie-json   <path>          Cookie JSON file (EditThisCookie or flat object)
@@ -107,6 +113,7 @@ function printHelp(): void {
     --max-retries   <n>             Max retries for failed requests (default: 3)
     --base-delay    <ms>            Base delay in ms for retry backoff (default: 1000)
     --proxy         <url>           Proxy URL (http:// or socks5://)
+    --parallel, -p                  Download multiple URLs in parallel
     --help, -h                      Show this help
 `);
 }
