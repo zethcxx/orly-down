@@ -1,23 +1,24 @@
-import type { ILogger } from "../ports/logger";
-import type { OreillyApi } from "../adapters/orly/api";
+import type { ILogger       } from "../ports/logger";
+import type { OreillyApi    } from "../adapters/orly/api";
 import type { EpubProcessor } from "../adapters/epub/processor";
-import type { EpubBuilder } from "../adapters/epub/builder";
-import type { IStorage } from "../ports/storage";
+import type { EpubBuilder   } from "../adapters/epub/builder";
+import type { IStorage      } from "../ports/storage";
+
 import { replaceInvalidDirectoryCharacters } from "../domain/utils";
 
 export interface DownloadEbookInput {
-  url: string;
-  output: string;
-  byPassWatermark?: boolean;
+  url              : string;
+  output           : string;
+  byPassWatermark ?: boolean;
 }
 
 export class DownloadEbookUseCase {
   constructor(
-    private readonly oreillyApi: OreillyApi,
+    private readonly oreillyApi   : OreillyApi,
     private readonly epubProcessor: EpubProcessor,
-    private readonly epubBuilder: EpubBuilder,
-    private readonly storage: IStorage,
-    private readonly logger: ILogger,
+    private readonly epubBuilder  : EpubBuilder,
+    private readonly storage      : IStorage,
+    private readonly logger       : ILogger,
   ) {}
 
   async execute(input: DownloadEbookInput): Promise<{ cacheDir: string; epubPath: string }> {
@@ -55,3 +56,4 @@ export class DownloadEbookUseCase {
     return { cacheDir, epubPath };
   }
 }
+

@@ -1,5 +1,5 @@
-import { zip, strToU8 } from "fflate";
-import type { AsyncZippable } from "fflate";
+import { zipSync, strToU8 } from "fflate";
+import type { Zippable } from "fflate";
 import type { IStorage } from "../../ports/storage";
 import type { Manifest, ManifestFile } from "../../domain/entities";
 import { replaceInvalidFileNameCharacters } from "../../domain/utils";
@@ -23,7 +23,7 @@ export class EpubBuilder {
   async buildFromCache(cacheDir: string, manifest: Manifest, outputDir: string): Promise<string> {
     const epubFilename = replaceInvalidFileNameCharacters(`${manifest.title}-${manifest.identifier}.epub`);
     const epubPath = this.storage.resolve(outputDir, epubFilename);
-    const zipData: AsyncZippable = {};
+    const zipData: Zippable = {};
 
     const packageFile = findPackageFile(manifest.files);
     const packagePath = packageFile?.full_path ?? "OEBPS/package.opf";
@@ -46,12 +46,7 @@ export class EpubBuilder {
       zipData[file.full_path] = [new Uint8Array(data), { level: level as 0 | 9 }];
     }
 
-    const zipped = await new Promise<Uint8Array>((resolve, reject) => {
-      zip(zipData, { level: 0 }, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
+    const zipped = zipSync(zipData, { level: 0 });
 
     await this.storage.ensureDir(epubPath);
     await this.storage.writeFile(epubPath, zipped);
